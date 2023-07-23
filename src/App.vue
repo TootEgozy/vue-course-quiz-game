@@ -1,6 +1,7 @@
 <template>
   <h1 v-html="this.question"></h1>
   <div class="input-container">
+
     <template v-for="answer in answers" :key="answer">
       <div class="radio-input">
         <input
@@ -13,12 +14,15 @@
         <label for="answer">{{ answer }}</label>
       </div>
     </template>
+
   </div>
+
   <button
     class="submit-btn"
     @click="this.submitAnswer()"
     v-if="!this.submitted"
   >
+
     Submit
   </button>
   <button
