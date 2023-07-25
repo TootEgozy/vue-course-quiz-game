@@ -1,4 +1,5 @@
 <template>
+  <ScoreBoard :win-count="this.winCount" lose-count="this.loseCount"/>
   <h1 v-html="this.question"></h1>
   <div class="input-container">
 
@@ -35,38 +36,59 @@
 </template>
 
 <script>
+import ScoreBoard from '@/components/ScoreBoard.vue'
 
 export default {
   name: 'App',
+  components: { ScoreBoard },
   data () {
     return {
       question: '',
       submitted: false,
       answers: [],
-      correctAnswer: '',
-      chosenAnswer: '',
+      correctAnswer: null,
+      chosenAnswer: null,
       winCount: 0,
       loseCount: 0
     }
   },
   methods: {
+
+    shuffleAnswers (answers) {
+      for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const temp = answers[i]
+        answers[i] = answers[j]
+        answers[j] = temp
+      }
+      return answers
+    },
+
     getQuestion () {
+      this.question = ''
+      this.submitted = false
+      this.answers = []
+      this.correctAnswer = null
+      this.chosenAnswer = null
       this.axios.get('https://opentdb.com/api.php?amount=1&category=17&difficulty=medium').then((res) => {
         const questionData = res.data.results[0]
         this.question = questionData.question
         this.correctAnswer = questionData.correct_answer
-        this.answers = questionData.incorrect_answers.concat(questionData.correct_answer)
+        this.answers = this.shuffleAnswers(questionData.incorrect_answers.concat(questionData.correct_answer))
       })
-      this.submitted = false
     },
 
     submitAnswer () {
-      this.submitted = true
-      console.log(this.chosenAnswer, this.correctAnswer)
-      if (String(this.chosenAnswer) === String(this.correctAnswer)) {
-        this.winCount++
+      if (this.chosenAnswer) {
+        this.submitted = true
+        console.log(this.chosenAnswer, this.correctAnswer)
+        if (String(this.chosenAnswer) === String(this.correctAnswer)) {
+          this.winCount++
+        } else {
+          this.loseCount++
+        }
       } else {
-        this.loseCount++
+        alert('please choose an answer')
       }
     }
   },
